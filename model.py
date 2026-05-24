@@ -17,5 +17,5 @@ class Batch:
         self.eta = eta
         self.available_quantity = qty
     
-    def allocate(self, line: OrderLine):
+    def allocate(self, line: OrderLine) -> None:
         self.available_quantity -= line.qty

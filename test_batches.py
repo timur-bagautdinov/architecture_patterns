@@ -2,7 +2,7 @@ from datetime import date
 
 from model import Batch, OrderLine
 
-def test_allocating_to_a_batch_reduces_the_available_quantity():
+def test_allocating_to_a_batch_reduces_the_available_quantity() -> None:
     batch = Batch("batch-01", "SMALL-TABLE", qty=20, eta=date.today())
 
     line = OrderLine("order-ref", "SMALL-TABLE", 2)
