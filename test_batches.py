@@ -57,3 +57,32 @@ def test_allocation_is_idempotent() -> None:
     batch.allocate(line)
 
     assert batch.available_quantity == 18
+
+
+def test_can_allocate_multiple_order_lines() -> None:
+    batch = Batch("batch-001", "TABLE", 20, eta=None)
+
+    line_1 = OrderLine("order-001", "TABLE", 2)
+    line_2 = OrderLine("order-002", "TABLE", 3)
+
+    batch.allocate(line_1)
+    batch.allocate(line_2)
+
+    assert batch.available_quantity == 15
+
+
+def test_cannot_allocate_second_line_if_not_enough_available_quantity() -> None:
+    batch = Batch("batch-001", "TABLE", 3, eta=None)
+
+    line_1 = OrderLine("order-001", "TABLE", 2)
+    line_2 = OrderLine("order-002", "TABLE", 2)
+
+    assert batch.can_allocate(line_1)
+
+    batch.allocate(line_1)
+
+    assert batch.can_allocate(line_2) is False
+
+    batch.allocate(line_2)
+
+    assert batch.available_quantity == 1
