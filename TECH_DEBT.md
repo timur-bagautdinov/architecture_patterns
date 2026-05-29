@@ -14,4 +14,7 @@
 - [ ] Decide repository `get()` behavior when a batch is not found.
       `SQLAlchemyRepository.get()` currently exposes SQLAlchemy's `.one()` exception for missing rows; domain/application code should not depend on persistence-specific exceptions.
 
+- [ ] Separate unit/integration tests from end-to-end API tests.
+      `test_api.py` now depends on a running web app at `localhost:5005`, so the default test command should distinguish fast local tests from Docker-backed e2e checks.
+
 ## Done
