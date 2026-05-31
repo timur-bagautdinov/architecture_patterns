@@ -15,7 +15,7 @@
       `test_api.py` now depends on a running web app at `localhost:5005`, so the default test command should distinguish fast local tests from Docker-backed e2e checks.
 
 - [ ] Move domain model construction out of Flask endpoints.
-      `flask_app.allocate_endpoint()` currently creates `model.OrderLine` directly; later, the service layer should accept primitive request data and construct domain objects internally.
+      `entry_points.flask_app.allocate_endpoint()` currently creates `model.OrderLine` directly; later, add simple request schemas/DTOs and let the service layer accept primitive request data or commands.
 
 ## Done
 
