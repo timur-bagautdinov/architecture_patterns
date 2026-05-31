@@ -2,18 +2,18 @@
 
 Study project for "Architecture Patterns with Python".
 
-## Run API With Docker
+## Run API and Postgres With Docker Compose
 
-Build the image:
+Start the Flask app and Postgres:
 
 ```bash
-docker build -t architecture-python-api .
+docker compose up --build
 ```
 
-Run the container, exposing the API on localhost:5005:
+Or run them in the background:
 
 ```bash
-docker run --rm -p 5005:80 architecture-python-api
+docker compose up --build -d
 ```
 
 Check the app:
@@ -28,9 +28,30 @@ Expected response:
 OK
 ```
 
+The API is exposed on `localhost:5005`.
+Postgres is exposed on `localhost:54321`.
+
+View logs:
+
+```bash
+docker compose logs -f
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+Stop the containers and remove the Postgres data volume:
+
+```bash
+docker compose down -v
+```
+
 ## Run Tests
 
-With the API container running:
+With the Docker Compose stack running:
 
 ```bash
 .venv/bin/python -m pytest test_api.py

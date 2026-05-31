@@ -16,6 +16,7 @@ mypy_extensions==1.1.0
 packaging==26.2
 pathspec==1.1.1
 pluggy==1.6.0
+psycopg2-binary==2.9.12
 Pygments==2.20.0
 pytest==9.0.3
 requests==2.34.2
