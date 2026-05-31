@@ -8,8 +8,8 @@ pytestmark = pytest.mark.unit
 
 
 class FakeRepository(repository.AbstractRepository):
-    def __init__(self, batches: list[model.Batch]) -> None:
-        self._batches = set(batches)
+    def __init__(self, batches: list[model.Batch] | None = None) -> None:
+        self._batches = set(batches or [])
     
     def add(self, batch: model.Batch) -> None:
         self._batches.add(batch)
@@ -27,17 +27,27 @@ class FakeSession:
 
 
 def test_returns_allocation() -> None:
-    batch = model.Batch("b1", "LAMP", 100, eta=None)
-    repo = FakeRepository([batch])
+    repo = FakeRepository()
+    session = FakeSession()
+    services.add_batch("b1", "LAMP", 100, None, repo, session)
 
-    result = services.allocate("o1", "LAMP", 10, repo, FakeSession())
+    result = services.allocate("o1", "LAMP", 10, repo, session)
 
     assert result == "b1"
 
 
 def test_error_for_invalid_sku() -> None:
-    batch = model.Batch("b1", "LAMP", 100, eta=None)
-    repo = FakeRepository([batch])
+    repo = FakeRepository()
+    session = FakeSession()
+    services.add_batch("b1", "LAMP", 100, None, repo, session)
 
     with pytest.raises(services.InvalidSKU, match="Invalid sku NONEXISTENTSKU"):
-        services.allocate("o1", "NONEXISTENTSKU", 10, repo, FakeSession())
+        services.allocate("o1", "NONEXISTENTSKU", 10, repo, session)
+
+
+def test_add_batch() -> None:
+    repo = FakeRepository()
+
+    services.add_batch("b1", "LAMP", 100, None, repo, FakeSession())
+
+    assert repo.get("b1") is not None
