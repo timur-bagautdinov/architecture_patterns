@@ -1,8 +1,7 @@
 import config
-import model
-import orm
-import repository
-import services
+from adapters import orm, repository
+from domain import model
+from service_layer import services
 
 
 from flask import Flask, request
@@ -21,7 +20,7 @@ def index() -> str:
 
 
 @app.route("/allocate", methods=["POST"])
-def allocate_endpoint():
+def allocate_endpoint() -> tuple[dict[str, str], int]:
     session = get_session()
     repo = repository.SQLAlchemyRepository(session)
     line = model.OrderLine(

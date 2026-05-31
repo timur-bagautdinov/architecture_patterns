@@ -2,7 +2,7 @@ import pytest
 
 from datetime import date, timedelta
 
-from model import Batch, OrderLine, OutOfStock, allocate
+from domain.model import Batch, OrderLine, OutOfStock, allocate
 
 pytestmark = pytest.mark.unit
 

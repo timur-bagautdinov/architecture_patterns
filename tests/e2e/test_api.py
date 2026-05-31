@@ -3,6 +3,7 @@ import pytest
 import requests
 
 import config
+from tests.types import AddStock
 
 pytestmark = pytest.mark.e2e
 
@@ -24,7 +25,7 @@ def random_orderid(name:str = "") -> str:
 
 
 @pytest.mark.usefixtures("restart_api")
-def test_happy_path_returns_201_and_allocated_batch(add_stock_with_cleanup: None) -> None:
+def test_happy_path_returns_201_and_allocated_batch(add_stock_with_cleanup: AddStock) -> None:
     sku = random_sku()
     other_sku = random_sku("other")
     early_batch = random_batchref("1")
@@ -39,7 +40,7 @@ def test_happy_path_returns_201_and_allocated_batch(add_stock_with_cleanup: None
         ]
     )
 
-    data = {"orderid": random_orderid(), "sku": sku, "qty": 3}
+    data: dict[str, str | int] = {"orderid": random_orderid(), "sku": sku, "qty": 3}
     url = config.get_api_url()
 
     r = requests.post(f"{url}/allocate", json=data)
@@ -49,9 +50,9 @@ def test_happy_path_returns_201_and_allocated_batch(add_stock_with_cleanup: None
 
 
 @pytest.mark.usefixtures("restart_api")
-def test_unhappy_path_returns_400_and_error_message():
+def test_unhappy_path_returns_400_and_error_message() -> None:
     unknown_sku, order_id = random_sku(), random_orderid()
-    data = {"orderid": order_id, "sku": unknown_sku, "qty": 20}
+    data: dict[str, str | int] = {"orderid": order_id, "sku": unknown_sku, "qty": 20}
 
     url = config.get_api_url()
     r = requests.post(f'{url}/allocate', json=data)

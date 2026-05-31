@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from model import Batch, OrderLine
+from domain.model import Batch, OrderLine
 
 pytestmark = pytest.mark.unit
 

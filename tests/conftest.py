@@ -4,15 +4,16 @@ import requests
 from requests import Response
 
 import config
+from tests.types import AddStock
 
 from collections.abc import Generator
 from pathlib import Path
 
-from sqlalchemy import Engine, create_engine, text
+from sqlalchemy import Connection, Engine, create_engine, text
 from sqlalchemy.orm import Session, clear_mappers, sessionmaker
 from sqlalchemy.exc import OperationalError
 
-from orm import metadata, start_mappers
+from adapters.orm import metadata, start_mappers
 
 
 @pytest.fixture
@@ -44,7 +45,7 @@ def wait_for_webapp_to_come_up() -> Response:
     pytest.fail("API never came up")
 
 
-def wait_for_postgres_to_come_up(engine):
+def wait_for_postgres_to_come_up(engine: Engine) -> Connection:
     deadline = time.time() + 10
     while time.time() < deadline:
         try:
@@ -56,7 +57,7 @@ def wait_for_postgres_to_come_up(engine):
 
 
 @pytest.fixture(scope="session")
-def postgres_db():
+def postgres_db() -> Engine:
     engine = create_engine(config.get_postgres_url())
     wait_for_postgres_to_come_up(engine)
     metadata.create_all(engine)
@@ -64,18 +65,18 @@ def postgres_db():
 
 
 @pytest.fixture
-def postgres_session(postgres_db):
+def postgres_session(postgres_db: Engine) -> Generator[Session]:
     start_mappers()
     yield sessionmaker(bind=postgres_db)()
     clear_mappers()
 
 
 @pytest.fixture
-def add_stock_with_cleanup(postgres_session) -> None:
+def add_stock_with_cleanup(postgres_session: Session) -> Generator[AddStock]:
     batches_added = set()
     skus_added = set()
 
-    def _add_stock(lines):
+    def _add_stock(lines: list[tuple[str, str, int, str | None]]) -> None:
         for ref, sku, qty, eta in lines:
             postgres_session.execute(
                 text(
@@ -121,6 +122,6 @@ def add_stock_with_cleanup(postgres_session) -> None:
 
 @pytest.fixture
 def restart_api() -> None:
-    (Path(__file__).parent / "flask_app.py").touch()
+    (Path(__file__).parent.parent / "entry_points" / "flask_app.py").touch()
     time.sleep(0.5)
     wait_for_webapp_to_come_up()
