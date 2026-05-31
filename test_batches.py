@@ -1,6 +1,10 @@
 from datetime import date
 
+import pytest
+
 from model import Batch, OrderLine
+
+pytestmark = pytest.mark.unit
 
 
 def make_batch_and_line(sku: str, batch_qty: int, line_qty: int) -> tuple[Batch, OrderLine]:

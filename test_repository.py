@@ -1,8 +1,12 @@
 import model
 import repository
 
+import pytest
+
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+pytestmark = pytest.mark.unit
 
 
 def test_repository_can_save_a_batch(session: Session) -> None:

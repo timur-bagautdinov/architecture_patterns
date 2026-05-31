@@ -51,16 +51,22 @@ docker compose down -v
 
 ## Run Tests
 
-With the Docker Compose stack running:
+Run tests that do not require Docker containers:
 
 ```bash
-.venv/bin/python -m pytest test_api.py
+make unit
+```
+
+With the Docker Compose stack running, run end-to-end tests:
+
+```bash
+make e2e
 ```
 
 Run the full test suite:
 
 ```bash
-.venv/bin/python -m pytest
+make test
 ```
 
 ## Type Check

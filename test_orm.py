@@ -2,8 +2,12 @@ import model
 
 from datetime import date
 
+import pytest
+
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+pytestmark = pytest.mark.unit
 
 
 def test_orderline_mappers_can_load_lines(session: Session) -> None:

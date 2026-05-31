@@ -4,6 +4,8 @@ import requests
 
 import config
 
+pytestmark = pytest.mark.e2e
+
 
 def random_suffix() -> str:
     return uuid.uuid4().hex[:6]
