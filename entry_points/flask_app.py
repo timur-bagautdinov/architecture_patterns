@@ -23,13 +23,11 @@ def index() -> str:
 def allocate_endpoint() -> tuple[dict[str, str], int]:
     session = get_session()
     repo = repository.SQLAlchemyRepository(session)
-    line = model.OrderLine(
-        request.json["orderid"], request.json["sku"],
-        request.json["qty"],
-    )
 
     try:
-        batchref = services.allocate(line, repo, session)
+        batchref = services.allocate(request.json["orderid"],
+                                     request.json["sku"],
+                                     request.json["qty"],  repo, session)
     except (model.OutOfStock, services.InvalidSKU) as exc:
         return {"message": str(exc)}, 400
     
