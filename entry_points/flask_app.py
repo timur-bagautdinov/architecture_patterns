@@ -1,12 +1,13 @@
 import config
-from adapters import orm, repository
-from domain import model
-from service_layer import services
 
-
+from datetime import datetime
 from flask import Flask, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from adapters import orm, repository
+from domain import model
+from service_layer import services
 
 
 app = Flask(__name__)
@@ -32,3 +33,23 @@ def allocate_endpoint() -> tuple[dict[str, str], int]:
         return {"message": str(exc)}, 400
     
     return {"batchref": batchref}, 201
+
+
+@app.route("/add_batch", methods=["POST"])
+def add_batch_endpoint() -> tuple[dict[str, str], int]:
+    session = get_session()
+    repo = repository.SQLAlchemyRepository(session)
+    eta = request.json["eta"]
+    if eta is not None:
+        eta = datetime.fromisoformat(eta).date()
+    
+    services.add_batch(
+        request.json["ref"],
+        request.json["sku"],
+        request.json["qty"],
+        eta,
+        repo,
+        session
+    )
+
+    return {"batchref": request.json["ref"]}, 201

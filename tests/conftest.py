@@ -72,19 +72,22 @@ def postgres_session(postgres_db: Engine) -> Generator[Session]:
 
 
 @pytest.fixture
-def add_stock_with_cleanup(postgres_session: Session) -> Generator[AddStock]:
+def add_stock_with_cleanup(
+    postgres_session: Session,
+    restart_api: None,
+) -> Generator[AddStock]:
     batches_added = set()
     skus_added = set()
 
     def _add_stock(lines: list[tuple[str, str, int, str | None]]) -> None:
+        url = config.get_api_url()
         for ref, sku, qty, eta in lines:
-            postgres_session.execute(
-                text(
-                    "INSERT INTO batches (reference, sku, _purchased_quantity, eta) "
-                    "VALUES (:ref, :sku, :qty, :eta)"
-                ),
-                dict(ref=ref, sku=sku, qty=qty, eta=eta)
+            r = requests.post(
+                f"{url}/add_batch",
+                json={"ref": ref, "sku": sku, "qty": qty, "eta": eta},
             )
+            assert r.status_code == 201
+            
 
             [[batch_id]] = postgres_session.execute(
                 text(
