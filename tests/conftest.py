@@ -25,6 +25,13 @@ def in_memory_db() -> Engine:
 
 
 @pytest.fixture
+def session_factory(in_memory_db: Engine) -> Generator[sessionmaker[Session]]:
+    start_mappers()
+    yield sessionmaker(bind=in_memory_db)
+    clear_mappers()
+
+
+@pytest.fixture
 def session(in_memory_db: Engine) -> Generator[Session]:
     start_mappers()
     yield sessionmaker(bind=in_memory_db)()
