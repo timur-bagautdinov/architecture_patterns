@@ -7,12 +7,11 @@ from sqlalchemy.orm import sessionmaker
 
 from adapters import orm, repository
 from domain import model
-from service_layer import services
+from service_layer import services, unit_of_work
 
 
 app = Flask(__name__)
 orm.start_mappers()
-get_session = sessionmaker(bind=create_engine(config.get_postgres_url()))
 
 
 @app.get("/")
@@ -22,13 +21,11 @@ def index() -> str:
 
 @app.route("/allocate", methods=["POST"])
 def allocate_endpoint() -> tuple[dict[str, str], int]:
-    session = get_session()
-    repo = repository.SQLAlchemyRepository(session)
-
     try:
         batchref = services.allocate(request.json["orderid"],
                                      request.json["sku"],
-                                     request.json["qty"],  repo, session)
+                                     request.json["qty"],
+                                     unit_of_work.SQLAlchemyUnitOfWork())
     except (model.OutOfStock, services.InvalidSKU) as exc:
         return {"message": str(exc)}, 400
     
@@ -37,8 +34,6 @@ def allocate_endpoint() -> tuple[dict[str, str], int]:
 
 @app.route("/add_batch", methods=["POST"])
 def add_batch_endpoint() -> tuple[dict[str, str], int]:
-    session = get_session()
-    repo = repository.SQLAlchemyRepository(session)
     eta = request.json["eta"]
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -48,8 +43,7 @@ def add_batch_endpoint() -> tuple[dict[str, str], int]:
         request.json["sku"],
         request.json["qty"],
         eta,
-        repo,
-        session
+        unit_of_work.SQLAlchemyUnitOfWork(),
     )
 
     return {"batchref": request.json["ref"]}, 201
