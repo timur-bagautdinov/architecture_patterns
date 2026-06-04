@@ -1,19 +1,13 @@
 from datetime import date
-from typing import Protocol, Optional
+from typing import Optional
 
 from domain import model
 
-from adapters.repository import AbstractRepository
 from service_layer import unit_of_work
 
 
 class InvalidSKU(Exception):
     pass
-
-
-class Session(Protocol):
-    def commit(self) -> None:
-        pass
 
 
 def is_valid_sku(sku: str, batches: list[model.Batch]) -> bool:

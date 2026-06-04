@@ -17,6 +17,24 @@
 - [ ] Move domain model construction out of Flask endpoints.
       `entry_points.flask_app.allocate_endpoint()` currently creates `model.OrderLine` directly; later, add simple request schemas/DTOs and let the service layer accept primitive request data or commands.
 
+- [ ] Add database constraints that preserve `Batch.reference` identity.
+      The domain treats `Batch.reference` as the batch identity via `Batch.__eq__()` and `Batch.__hash__()`, but `batches.reference` is currently nullable and not unique.
+
+- [ ] Align ORM nullability with required domain fields.
+      `OrderLine.orderid`, `OrderLine.sku`, and `Batch.sku` are required strings in the domain model, but the matching ORM columns allow `NULL`.
+
+- [ ] Tighten `allocations` table constraints.
+      `allocations.orderline_id` and `allocations.batch_id` should not be nullable, and the table should prevent duplicate `(orderline_id, batch_id)` pairs to match the domain's set-based allocation model.
+
+- [ ] Avoid creating the default database engine at `unit_of_work` import time.
+      `service_layer.unit_of_work.DEFAULT_SESSION_FACTORY` currently calls `create_engine(config.get_postgres_url())` at module import time; defer this or move composition closer to the entrypoint.
+
+- [ ] Make `FakeUnitOfWork` transaction behavior observable in service tests.
+      `FakeUnitOfWork.commit()` and `FakeUnitOfWork.rollback()` currently do nothing, so service-layer tests do not verify that services cross the transaction boundary.
+
+- [ ] Replace Flask reloader timestamp mutation in e2e setup.
+      `tests.conftest.restart_api()` currently touches `entry_points/flask_app.py` to trigger a reload; replace this with an explicit test-only restart or health mechanism.
+
 ## Done
 
 - [x] Added `Repository.list()` to the abstract repository interface.

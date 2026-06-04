@@ -1,11 +1,7 @@
-import config
-
 from datetime import datetime
 from flask import Flask, request
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from adapters import orm, repository
+from adapters import orm
 from domain import model
 from service_layer import services, unit_of_work
 
