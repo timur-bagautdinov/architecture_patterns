@@ -11,7 +11,16 @@ from service_layer import unit_of_work
 pytestmark = pytest.mark.unit
 
 
-def insert_batch(session: Session, ref: str, sku: str, qty: int, eta: date | None) -> None:
+def insert_batch(session: Session, ref: str, sku: str, qty: int, eta: date | None,
+                 product_version: int = 1) -> None:
+    session.execute(
+        text(
+            "INSERT INTO products (sku, version_number) "
+            "VALUES(:sku, :version)"
+        ),
+        dict(sku=sku, version=product_version)
+    )
+    
     session.execute(
         text(
             "INSERT INTO batches (reference, sku, _purchased_quantity, eta) "
@@ -46,9 +55,10 @@ def test_uow_can_retrieve_a_batch_and_allocate_to_it(
 
     uow = unit_of_work.SQLAlchemyUnitOfWork(session_factory)
     with uow:
-        batch = uow.batches.get(reference="batch1")
+        product = uow.products.get("BENCH")
+        assert product is not None
         line = model.OrderLine("o1", "BENCH", 10)
-        batch.allocate(line)
+        product.allocate(line)
         uow.commit()
     
     batchref = get_allocated_batch_ref(session, "o1", "BENCH")

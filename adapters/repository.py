@@ -6,15 +6,11 @@ from sqlalchemy.orm import Session
 
 class AbstractRepository(abc.ABC):
     @abc.abstractmethod
-    def add(self, batch: model.Batch) -> None:
+    def add(self, product: model.Product) -> None:
         raise NotImplementedError
     
     @abc.abstractmethod
-    def get(self, reference: str) -> model.Batch:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def list(self) -> list[model.Batch]:
+    def get(self, reference: str) -> model.Product | None:
         raise NotImplementedError
 
 
@@ -22,11 +18,8 @@ class SQLAlchemyRepository(AbstractRepository):
     def __init__(self, session: Session) -> None:
         self.session = session
     
-    def add(self, batch: model.Batch) -> None:
-        self.session.add(batch)
+    def add(self, product: model.Product) -> None:
+        self.session.add(product)
     
-    def get(self, reference: str) -> model.Batch:
-        return self.session.query(model.Batch).filter_by(reference=reference).one()
-
-    def list(self) -> list[model.Batch]:
-        return self.session.query(model.Batch).all()
+    def get(self, sku: str) -> model.Product | None:
+        return self.session.query(model.Product).filter_by(sku=sku).first()
