@@ -57,6 +57,12 @@ Run tests that do not require Docker containers:
 make unit
 ```
 
+Run integration tests:
+
+```bash
+make integration
+```
+
 With the Docker Compose stack running, run end-to-end tests:
 
 ```bash

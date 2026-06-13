@@ -8,7 +8,7 @@ from domain import model
 from service_layer import unit_of_work
 
 
-pytestmark = pytest.mark.unit
+pytestmark = pytest.mark.integration
 
 
 def insert_batch(session: Session, ref: str, sku: str, qty: int, eta: date | None,
